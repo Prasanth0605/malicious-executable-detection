@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malware Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Malware Detector</h1>
+            <p class="subtitle">Upload an executable file for analysis</p>
+        </header>
+
+        {% if not model_trained %}
+        <div class="alert alert-warning">
+            <strong>Model Not Trained!</strong>
+            <p>Run: <code>python train_model.py --dataset &lt;path_to_dataset.csv&gt;</code></p>
+        </div>
+        {% endif %}
+
+        <div class="upload-section">
+            <form id="uploadForm" method="POST" action="/upload" enctype="multipart/form-data" {% if not model_trained %}class="disabled"{% endif %}>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" name="file" accept=".exe,.dll,.bin,.apk" required {% if not model_trained %}disabled{% endif %}>
+                    <label for="fileInput" class="file-label">
+                        <span id="fileName">Choose File</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-submit" {% if not model_trained %}disabled{% endif %}>
+                    Analyze
+                </button>
+            </form>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            }
+        });
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!fileInput.files.length) {
+                alert('Please select a file');
+                return;
+            }
+
+            loading.style.display = 'block';
+            
+            const formData = new FormData(this);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.text();
+            })
+            .then(html => {
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                alert('Error: ' + (error.error || 'Failed to analyze file'));
+            });
+        });
+    </script>
+</body>
+</html>

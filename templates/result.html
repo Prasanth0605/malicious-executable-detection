@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Analysis Result</h1>
+            <p class="subtitle">{{ result.filename }}</p>
+        </header>
+
+        <div class="result-section">
+            <div class="result-card {% if result.prediction == 'Malicious' %}malicious{% else %}benign{% endif %}">
+                <h2 class="result-title">{{ result.prediction }}</h2>
+                <div class="confidence-badge">
+                    {{ "%.1f"|format(result.confidence) }}% Confidence
+                </div>
+            </div>
+
+            <div class="probability-section">
+                <div class="probability-item">
+                    <div class="probability-header">
+                        <span class="probability-label">Benign</span>
+                        <span class="probability-value">{{ "%.1f"|format(result.benign_probability) }}%</span>
+                    </div>
+                    <div class="probability-bar-bg">
+                        <div class="probability-bar benign-bar" style="width: {{ result.benign_probability }}%"></div>
+                    </div>
+                </div>
+
+                <div class="probability-item">
+                    <div class="probability-header">
+                        <span class="probability-label">Malicious</span>
+                        <span class="probability-value">{{ "%.1f"|format(result.malicious_probability) }}%</span>
+                    </div>
+                    <div class="probability-bar-bg">
+                        <div class="probability-bar malicious-bar" style="width: {{ result.malicious_probability }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/" class="btn-primary">Analyze Another File</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultCard = document.querySelector('.result-card');
+            resultCard.style.opacity = '0';
+            resultCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                resultCard.style.transition = 'all 0.5s ease';
+                resultCard.style.opacity = '1';
+                resultCard.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
