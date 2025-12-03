@@ -27,7 +27,7 @@ A machine learning-powered web application for detecting malicious executables u
 
 1. **Clone or navigate to the project directory**:
    ```bash
-   cd /home/prasanth/Desktop/ML_PROJECT
+   git clone https://github.com/Prasanth0605/malicious-executable-detection/
    ```
 
 2. **Create a virtual environment** (recommended):
